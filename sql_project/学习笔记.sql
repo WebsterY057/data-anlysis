@@ -1,7 +1,7 @@
--- ´°¿Úº¯Êı  ĞĞÊı²»±ä£¬Ã¿Ò»ĞĞ·µ»ØÒ»¸öÖµ
---º¯ÊıÃû() over ([PARTITON BY ·ÖÇø×Ö¶Î][ORDER BY ÅÅĞò×Ö¶Î][rows/range ´°¿Ú·¶Î§])
+-- çª—å£å‡½æ•°  è¡Œæ•°ä¸å˜ï¼Œæ¯ä¸€è¡Œè¿”å›ä¸€ä¸ªå€¼
+--å‡½æ•°å() over ([PARTITON BY åˆ†åŒºå­—æ®µ][ORDER BY æ’åºå­—æ®µ][rows/range çª—å£èŒƒå›´])
 
--- ³£ÓÃ´°¿Úº¯Êı
+-- å¸¸ç”¨çª—å£å‡½æ•°
 create table sales (
        salesperson varchar2(20),
        amount number(4),
@@ -9,16 +9,16 @@ create table sales (
        
 select * from sales ;
 
-insert into sales values ('ÕÅÈı',100,date '2024-01-01');
-insert into sales values ('ÕÅÈı',200,date '2024-01-02');
-insert into sales values ('ÀîËÄ',150,date '2024-01-01');
-insert into sales values ('ÀîËÄ',300,date '2024-01-02');
-insert into sales values ('ÍõÎå',150,date '2024-01-01');
+insert into sales values ('å¼ ä¸‰',100,date '2024-01-01');
+insert into sales values ('å¼ ä¸‰',200,date '2024-01-02');
+insert into sales values ('æå››',150,date '2024-01-01');
+insert into sales values ('æå››',300,date '2024-01-02');
+insert into sales values ('ç‹äº”',150,date '2024-01-01');
 
-update sales set amount = 250 where salesperson = 'ÍõÎå';
--- row_number():Á¬ĞøÅÅÃû 1£¬2£¬3
--- rank()£ºÌøÔ¾ÅÅÃû 113£¬ÔÊĞí²¢ÁĞ
--- dense_rank (): ÃÜ¼¯ÅÅÃû 112 £¬ÔÊĞí²¢ÁĞ
+update sales set amount = 250 where salesperson = 'ç‹äº”';
+-- row_number():è¿ç»­æ’å 1ï¼Œ2ï¼Œ3
+-- rank()ï¼šè·³è·ƒæ’å 113ï¼Œå…è®¸å¹¶åˆ—
+-- dense_rank (): å¯†é›†æ’å 112 ï¼Œå…è®¸å¹¶åˆ—
 
 select s.salesperson 
       ,s.amount
@@ -39,7 +39,7 @@ select s.salesperson
 from sales s;
 
 
--- ¾ÛºÏº¯Êı+´°¿Ú
+-- èšåˆå‡½æ•°+çª—å£
 select s.salesperson 
       ,s.amount
       ,s.sale_date
@@ -47,7 +47,7 @@ select s.salesperson
       ,sum(amount) over () as all_total
 from sales s;
 
---Ç°ºóĞĞ±È½Ï
+--å‰åè¡Œæ¯”è¾ƒ
 select s.salesperson 
       ,s.amount
       ,s.sale_date
@@ -55,7 +55,7 @@ select s.salesperson
       ,lead(s.amount,1,0) over (partition by s.salesperson order by s.sale_date) as next_amount
 from sales s;
 
--- Ã¿¸öÈË½üÁ½ÌìµÄÆ½¾ù½ğ¶î
+-- æ¯ä¸ªäººè¿‘ä¸¤å¤©çš„å¹³å‡é‡‘é¢
 select s.*
       ,AVG(s.amount) OVER (
            PARTITION BY s.salesperson 
@@ -64,7 +64,7 @@ select s.*
        ) as avg_amount
 from sales s;
 
--- Ã¿¸öÈË½ğ¶îÅÅÃûµÚÒ»µÄĞÅÏ¢
+-- æ¯ä¸ªäººé‡‘é¢æ’åç¬¬ä¸€çš„ä¿¡æ¯
 select a.*
 from (
     select s.*,
@@ -73,7 +73,7 @@ from (
 ) a
 where a.amount_rank = 1;
 
--- ¼ÆËãÃ¿¸öÏúÊÛÔ±µÄÀÛ¼ÆÏúÊÛ¶î
+-- è®¡ç®—æ¯ä¸ªé”€å”®å‘˜çš„ç´¯è®¡é”€å”®é¢
 select salesperson, sale_date, amount,
        SUM(amount) OVER (
            PARTITION BY salesperson 
@@ -82,39 +82,39 @@ select salesperson, sale_date, amount,
        ) as cumulative_amount
 from sales;
 
--- ²»Í¬´°¿Ú·¶Î§Ê¾Àı
-ROWS BETWEEN 2 PRECEDING AND CURRENT ROW  -- µ±Ç°ĞĞ¼°Ç°2ĞĞ
-ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING  -- Ç°1ĞĞ¡¢µ±Ç°ĞĞ¡¢ºó1ĞĞ
-RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  -- ´Ó¿ªÊ¼µ½µ±Ç°ĞĞ
-ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING  -- µ±Ç°ĞĞµ½×îºó
+-- ä¸åŒçª—å£èŒƒå›´ç¤ºä¾‹
+ROWS BETWEEN 2 PRECEDING AND CURRENT ROW  -- å½“å‰è¡ŒåŠå‰2è¡Œ
+ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING  -- å‰1è¡Œã€å½“å‰è¡Œã€å1è¡Œ
+RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  -- ä»å¼€å§‹åˆ°å½“å‰è¡Œ
+ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING  -- å½“å‰è¡Œåˆ°æœ€å
 
 
--- GROUP BY: ¾ÛºÏ£¬¼õÉÙĞĞÊı
+-- GROUP BY: èšåˆï¼Œå‡å°‘è¡Œæ•°
 select salesperson, sum(amount)
 from sales
-group by salesperson;  -- ·µ»Ø3ĞĞ
+group by salesperson;  -- è¿”å›3è¡Œ
 
--- ´°¿Úº¯Êı: ±£³ÖÔ­ĞĞÊı
+-- çª—å£å‡½æ•°: ä¿æŒåŸè¡Œæ•°
 select salesperson, amount, 
        sum(amount) OVER (PARTITION BY salesperson) as total
-from sales;  -- ·µ»Ø5ĞĞ
+from sales;  -- è¿”å›5è¡Œ
 
 select max(amount) over (partition by s.salesperson) as max_amount,s.* 
 from sales s;
 
 
---Ë÷Òı
+--ç´¢å¼•
 
---ÊÓÍ¼£¬ĞéÄâ±í
+--è§†å›¾ï¼Œè™šæ‹Ÿè¡¨
 
---´æ´¢¹ı³Ì
+--å­˜å‚¨è¿‡ç¨‹
 
---´¥·¢Æ÷
+--è§¦å‘å™¨
 
---ÊÂÎñ¿ØÖÆ
+--äº‹åŠ¡æ§åˆ¶
 
---ĞÔÄÜÓÅ»¯¼¼ÇÉ
+--æ€§èƒ½ä¼˜åŒ–æŠ€å·§
 
---·ÖÇø±í
+--åˆ†åŒºè¡¨
 
---ÊµÓÃº¯ÊıÓëÌØĞÔ
+--å®ç”¨å‡½æ•°ä¸ç‰¹æ€§
